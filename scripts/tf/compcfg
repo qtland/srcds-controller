@@ -1,0 +1,32 @@
+#!/bin/bash
+if (( SHLVL < 3 )) ; then
+if [[ "$1" != "--skip-shell-check" ]]; then
+    echo "ERROR: This file is only set to run from SRCDS Controller shell script."
+    echo "Running $(basename $0) --skip-shell-check will bypass this check."
+    exit 0
+fi
+fi
+i=0
+PORT_NUM=$(( ( RANDOM % 69999 )  + 1 ))
+DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+
+until [ $i == $userinput ]
+do
+    i=$((i+1))
+    PORT_NUM=$(( ( RANDOM % 69999 )  + 1 ))
+       echo "hostname Your Competitive Server #$i" >> $DIR/tf/cfg/server$i.cfg
+       echo "sv_allow_votes 0" >> $DIR/tf/cfg/server$i.cfg
+       echo "sv_vote_issue_kick_allowed 0" >> $DIR/tf/cfg/server$i.cfg
+       echo "sv_vote_issue_nextlevel_allowed 0" >> $DIR/tf/cfg/server$i.cfg
+       echo "sv_vote_issue_mvm_challenge_allowed 0" >> $DIR/tf/cfg/server$i.cfg
+       echo "sv_vote_issue_scramble_teams_allowed 0" >> $DIR/tf/cfg/server$i.cfg
+       echo "sv_vote_issue_extendlevel_allowed 0" >> $DIR/tf/cfg/server$i.cfg
+       echo "mp_forcecamera 1" >> $DIR/tf/cfg/server$i.cfg
+       echo "tf_gravetalk 1" >> $DIR/tf/cfg/server$i.cfg
+       echo "tf_competitive_preround_duration 3" >> $DIR/tf/cfg/server$i.cfg
+       echo "tf_bot_quota 0" >> $DIR/tf/cfg/server$i.cfg
+       echo "tf_bot_quota_mode normal" >> $DIR/tf/cfg/server$i.cfg
+       echo "mp_autoteambalance 0" >> $DIR/tf/cfg/server$i.cfg
+       echo "mp_scrambleteams_auto 0" >> $DIR/tf/cfg/server$i.cfg
+       echo "tf_ctf_bonus_time 0" >> $DIR/tf/cfg/server$i.cfg
+done

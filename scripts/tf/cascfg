@@ -1,0 +1,36 @@
+#!/bin/bash
+if (( SHLVL < 3 )) ; then
+if [[ "$1" != "--skip-shell-check" ]]; then
+    echo "ERROR: This file is only set to run from SRCDS Controller shell script."
+    echo "Running $(basename $0) --skip-shell-check will bypass this check."
+    exit 0
+fi
+fi
+i=0
+PORT_NUM=$(( ( RANDOM % 69999 )  + 1 ))
+DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+
+until [ $i == $userinput ]
+do
+    i=$((i+1))
+    PORT_NUM=$(( ( RANDOM % 69999 )  + 1 ))
+    echo "hostname Your Casual Server #$i" >> $DIR/tf/cfg/server$i.cfg
+    echo "tf_weapon_criticals 1" >> $DIR/tf/cfg/server$i.cfg
+    echo "sv_allow_votes 1" >> $DIR/tf/cfg/server$i.cfg
+    echo "mp_spectators_restricted 0" >> $DIR/tf/cfg/server$i.cfg
+    echo "mp_allowspectators 1" >> $DIR/tf/cfg/server$i.cfg
+    echo "mp_forceautoteam 1" >> $DIR/tf/cfg/server$i.cfg
+    echo "mp_forcecamera 1" >> $DIR/tf/cfg/server$i.cfg
+    echo "mp_idledealmethod 2" >> $DIR/tf/cfg/server$i.cfg
+    echo "mp_idlemaxtime 10" >> $DIR/tf/cfg/server$i.cfg
+    echo "net_chan_limit_msec 0" >> $DIR/tf/cfg/server$i.cfg
+    echo "tf_bot_quota 0" >> $DIR/tf/cfg/server$i.cfg
+    echo "tf_bot_quota_mode normal" >> $DIR/tf/cfg/server$i.cfg
+    echo "sv_minrate 30000" >> $DIR/tf/cfg/server$i.cfg
+    echo "sv_vote_issue_kick_spectators_mvm 0" >> $DIR/tf/cfg/server$i.cfg
+    echo "sv_vote_issue_restart_game_allowed 0" >> $DIR/tf/cfg/server$i.cfg
+    echo "sv_vote_issue_changelevel_allowed 0" >> $DIR/tf/cfg/server$i.cfg
+    echo "sv_vote_issue_nextlevel_allowed 0" >> $DIR/tf/cfg/server$i.cfg
+    echo "sv_vote_issue_extendlevel_allowed 0" >> $DIR/tf/cfg/server$i.cfg
+    echo "sv_vote_issue_scramble_teams_allowed 0" >> $DIR/tf/cfg/server$i.cfg
+done

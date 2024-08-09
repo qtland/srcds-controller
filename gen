@@ -1,0 +1,211 @@
+#!/bin/bash
+# Prevent confusion and idiot proofing.
+FROM_GH=1
+if ! command -v git > /dev/null; then 
+    FROM_GH=0
+fi
+
+if [[ ! -d .git ]] ; then
+    FROM_GH=0
+fi
+
+if [[ ! -d scripts/ ]] ; then
+   DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+    echo "ERROR: The required folder '$DIR/scripts' was not found or has been deleted.  Verify the folder's location and try again."
+    exit 1
+fi
+
+if [[ ! -d ./int/ ]] ; then
+    DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+    echo "ERROR: The required folder '$DIR/int' was not found or has been deleted.  Verify the folder's location and try again."
+    exit 1
+fi
+
+if [[ ! -e scripts/tf ]]; then
+   DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+    echo "ERROR: The required files within '$DIR/scripts/tf/' was not found or has been deleted.  Verify the files location and try again."
+    exit 1
+fi
+
+if [ ! -f "scripts/tf/mvmgen" ]; then
+   DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+    echo "ERROR: The required file '$DIR/scripts/tf/mvmgen' was not found or has been deleted.  Verify the file's location and try again."
+    exit 1
+fi
+
+if [ ! -f "scripts/tf/compgen" ]; then
+   DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+    echo "ERROR: The required file '$DIR/scripts/tf/compgen' was not found or has been deleted.  Verify the file's location and try again."
+    exit 1
+fi
+
+if [ ! -f "scripts/tf/casgen" ]; then
+   DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+    echo "ERROR: The required file '$DIR/scripts/tf/casgen' was not found or has been deleted.  Verify the file's location and try again."
+    exit 1
+fi
+
+filesize=$(wc -c "scripts/tf/casgen" | awk '{print $1}')
+if [ ! "$filesize"  = "619" ]; then
+   DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+    echo "ERROR: The required file '$DIR/scripts/tf/casgen' was modified or has been deleted.  Verify the file's location and try again."
+exit 0
+fi
+
+filesize2=$(wc -c "scripts/tf/mvmgen" | awk '{print $1}')
+if [ ! "$filesize2"  = "619" ]; then
+   DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+    echo "ERROR: The required file '$DIR/scripts/tf/mvmgen' was modified or has been deleted.  Verify the file's location and try again."
+exit 0
+fi
+
+filesize3=$(wc -c "scripts/tf/compgen" | awk '{print $1}')
+if [ ! "$filesize3"  = "619" ]; then
+   DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+    echo "ERROR: The required file '$DIR/scripts/tf/compgen' was modified or has been deleted.  Verify the file's location and try again."
+    exit 0
+fi
+
+ver=1.56
+
+
+initArch() {
+  ARCH1=$(uname -m)
+  ARCH=$(uname -m)
+  case $ARCH in
+    armv5*) ARCH="armv5";;
+    armv6*) ARCH="armv6";;
+    armv7*) ARCH="arm";;
+    aarch64) ARCH="arm64";;
+    x86) ARCH="386";;
+    x86_64) ARCH="amd64";;
+    i686) ARCH="386";;
+    i386) ARCH="386";;
+  esac
+}
+
+initOSType() {
+OS=""
+case "$OSTYPE" in
+  solaris*) OS="Solaris" ;;
+  darwin*)  OS="OSX" ;; 
+  linux*)   OS="Linux" ;;
+  bsd*)     OS="BSD" ;;
+  msys*)    OS="Windows" ;;
+  *)        OS="unknown: $OSTYPE" ;;
+esac
+}
+
+clear
+initArch
+initOSType
+if [ $FROM_GH = 0 ]; then
+   echo "SRCDS Server Generator - $OS $ARCH ($ARCH1) Modified Build"
+   echo "WARNING - This version isn't downloaded from GitHub and it may have been modified."
+   echo "Download SRCDS Controller from GitHub: https://github.com/qtland/srcds-controller"
+   echo ""
+else
+  echo "SRCDS Server Generator - $OS $ARCH ($ARCH1) Build"
+fi
+
+
+show_help() {
+  echo "Usage: $(basename $0) [OPTIONS]"
+  echo "Options:"
+  echo "  -h, --help     Display this help message"
+  echo "  -v, --version  Display version"
+  echo "  -g, --game     Set the game to generate"
+  echo "  -t, --type     Set the type to generate"
+  exit 0
+}
+
+show_usage() {
+  echo -e "NAME and TYPE must be present in your argument. More TYPE will be supported soon but you can modify the script to add yours.\n"
+  echo "Usage: $(basename $0) [-g NAME] [-t TYPE] (-cfg)"
+  echo -e "NAME variable can be: tf, csgo\nTYPE variable can be: TF2: mvm, comp, cas\n                      CS:GO: casual, competitive, deathmatch\n"
+  exit 0
+}
+
+if [[ "$1" != "" && "$1" != "--help" && "$1" != "-h" && "$1" != "-g" && "$1" != "-t"  && "$1" != "--game" && "$1" != "--type" && "$1" != "-v" && "$1" != "--version" ]]; then
+echo "ERROR: Unknown command argument '$1'."
+exit 0
+fi
+
+if [[ "$1" == "-v" || "$1" == "--version" ]]; then
+clear
+if [ $FROM_GH = 0 ]; then
+   echo -e "SRCDS Server Generator $ver (modified) : $OS $ARCH ($ARCH1)"
+else
+  echo -e "SRCDS Server Generator $ver : $OS $ARCH ($ARCH1)"
+  echo -e "Copyright (c) $(date +%Y), qtland Networks"
+fi
+fi
+
+if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+	show_help
+fi
+
+if [ -z "$1" ]; then
+  	show_help
+fi
+
+
+if [ "$1" == "-g" ] || [ "$1" == "--game" ]; then
+ if [ -z "$2" ]; then
+	show_usage
+
+elif [[ "$2" == "tf" ]] || [[ "$2" == "csgo" ]]; then	
+  echo -e "Settings [OK]: Successfully set GAME variable to $2."
+else 
+ echo -e "ERROR: There was no game found under your argument '$2'. Please check if this game is defined in the script, or try again.\n" 
+ echo "Usage: $(basename $0) [-g NAME]"
+ echo -e "NAME variable can be: tf, csgo"
+fi
+fi
+
+if [ "$3" == "-t" ] || [ "$3" == "--type" ]; then
+ if [ -z "$4" ]; then
+ echo -e "ERROR: TYPE must be present in your argument. More TYPE will be supported soon but you can modify the script to add yours.\n"
+  echo "Usage: $(basename $0) -g $2 [-t TYPE]"
+  echo -e "TYPE variable can be: TF2: mvm, comp, cas\n                      CS:GO: casual, competitive, deathmatch\n"
+  exit 0
+fi
+fi
+if [[ "$2" == "csgo" ]]; then
+if [ "$4" == "casual" ] || [ "$4" == "competitive" ] || [ "$4" == "deathmatch" ]; then
+  echo -e "ERROR: There are no support for csgo yet. Please check the github page for updates on supporting this game."
+   exit 0
+else
+ echo -e "ERROR: There was no type found under your argument '$4'. Please check if this type is defined in the script, or try again.\n" 
+ echo "Usage: $(basename $0) -g $2 [-t TYPE]"
+  echo -e "TYPE variable can be: CS:GO: casual, competitive, deathmatch\n"
+  exit 0
+fi
+fi
+
+
+if [[ "$2" == "tf" ]]; then
+if [ "$4" == "cas" ] || [ "$4" == "mvm" ] || [ "$4" == "comp" ]; then
+  echo -e "Settings [OK]($2): Successfully set TYPE variable to $4."
+  echo -n "How much servers do you need to generate? "
+  read userinput
+  re='^[0-9]+$'
+if ! [[ $userinput =~ $re ]] ; then
+   echo "ERROR: Invalid number, abandoning..." >&2; exit 1
+fi
+
+    . scripts/$2/$4gen --skip-shell-check
+     DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+    echo "[OK] Created $userinput server entries inside $DIR/int/."
+    . scripts/$2/rungen
+    echo "[OK] Created 1 server start entry including $userinput server elements in $DIR/int/."
+     . scripts/$2/$4cfg --skip-shell-check
+    echo "[OK] Created $userinput server entries inside $DIR/$2/cfg/."
+  
+else
+ echo -e "ERROR: There was no type found under your argument '$4'. Please check if this type is defined in the script, or try again.\n" 
+ echo "Usage: $(basename $0) -g $2 [-t TYPE]"
+  echo -e "TYPE variable can be: TF2: mvm, comp, cas\n"
+  exit 0
+fi
+fi

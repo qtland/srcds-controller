@@ -1,0 +1,13 @@
+#!/bin/bash
+REG=bta1
+NUM=050
+i=0
+rm int/run.sh &> /dev/null
+
+echo "#!/bin/bash" >> ./int/run.sh
+until [ $i == $userinput ]
+do
+    i=$((i+1))
+       echo "pm2 start s$i.sh --name srcds$NUM-$REG#$i --watch" >> ./int/run.sh
+       echo "echo \"[SRCDSController] Starting $REG#$i...\"" >> ./int/run.sh
+done

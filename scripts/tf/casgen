@@ -1,0 +1,19 @@
+#!/bin/bash
+if (( SHLVL < 3 )) ; then
+if [[ "$1" != "--skip-shell-check" ]]; then
+    echo "ERROR: This file is only set to run from SRCDS Controller shell script."
+    echo "Running $(basename $0) --skip-shell-check will bypass this check."
+    exit 0
+fi
+fi
+i=0
+PORT_NUM=$(( ( RANDOM % 69999 )  + 1 ))
+rm ./int/s*.sh &> /dev/null
+
+until [ $i == $userinput ]
+do
+    i=$((i+1))
+    PORT_NUM=$(( ( RANDOM % 69999 )  + 1 ))
+    echo "/home/$USER/srcds/srcds_run -game tf +maxplayers 24 +ip 0.0.0.0 +randommap +sv_pure 1 -port $PORT_NUM +exec server$i.cfg -norestart -debug -nohltv" >> ./int/s$i.sh
+    cat int/s$i.sh
+done
