@@ -83,7 +83,7 @@ npm i pm2 -g
 
 ### Preparing files for SRCDS Controller (csgo/tf)
 > [!IMPORTANT]
-> The script doesn't require sudo permissions so therefor you must run the script under the `gameserver` user.
+> The script doesn't require sudo permissions therefor allowing you to run script under the `gameserver` user.
 
 You need to create an `int` folder in `gameserver`'s root (`/home/gameserver/int`).  The shell scripts exist in case your servers are unable to start or crash on startup. You can create the required files by invoking the script with command line arguments:
 ```
